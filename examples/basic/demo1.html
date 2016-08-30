@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>vue-router基础</title>
+</head>
+<body>
+	<div id="app">
+		<div>
+      <!-- 用v-link绑定HTML标签（但不局限于a标签） -->
+	    <a v-link="{ path: '/home'}">Home</a>
+	    <a v-link="{ path: '/about'}">About</a>
+		</div>
+    <!-- 路由外链: 路由过来所展示的地方 -->
+		<router-view></router-view>
+	</div>
+	<script src="vue.js"></script>
+	<script src="vue-router.js"></script>
+	<script>
+    //创建组件构造器
+		const Home = Vue.extend({
+	    template: '<div><h1>Home</h1><p>{{msg}}</p></div>',
+	    data: () => {
+	        return {
+	            msg: 'Hello, vue-router!'
+	        }
+	    }
+		})
+
+		const About = Vue.extend({
+	    template: '<div><h1>About</h1><p>{{msg}}</p></div>',
+      data: () => {
+        return{
+          msg: 'vue-router: official route component'
+        }
+      }
+		})
+
+    //创建路由
+		const router = new VueRouter()
+
+    //映射路由
+		router.map({
+	    '/home': { component: Home },
+	    '/about': { component: About }
+		})
+
+    //默认路由到home
+    router.redirect({
+      '/': '/home'
+    })
+
+    //路由器的根组件，事例中为空
+		const App = Vue.extend({})
+
+    //启动路由
+		router.start(App, '#app')
+	</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>嵌套路由</title>
+</head>
+<body>
+  <div id="container">
+    <div id="app">
+      <router-link to="/home"><a>Home</a></router-link>
+      <router-link to="/about"><a>About</a></router-link>
+      <router-view></router-view>
+    </div>
+  </div>
+  <template id="home">
+    <div>
+      <h1>Home</h1>
+      <p>{{msg}}</p>
+      <router-link to="/bar"><a>Bar</a></router-link>
+      <router-link to="/sub"><a>Sub</a></router-link>
+      <router-view></router-view>
+    </div>
+  </template>
+  <script src="vue2.js"></script>
+  <script src="vue-router2.js"></script>
+  <script>
+    const Home = Vue.extend({
+      template: '#home',
+      data: () => {
+          return {
+              msg: 'Hello, vue-router!'
+          }
+      }
+    })
+
+    const About = Vue.extend({
+      template: '<div><h1>About</h1><p>{{msg}}</p></div>',
+      data: () => {
+        return{
+          msg: 'vue-router: official route component'
+        }
+      }
+    })
+
+    const Bar = Vue.extend({
+      template: '<div><h2>Bar</h2><p>This is Bar</p></div>'
+    })
+
+    const Sub = Vue.extend({
+      template: '<div><h2>Sub</h2><p>This is Sub</p></div>'
+    })
+
+    const router = new VueRouter({
+      routes: [
+        {
+          path: '/', component: Home
+        },
+        {
+          path: '/home', component: Home,
+          // 在2.0中用children代替subRoutes，写法也有点变化
+          children: [
+            {path: '/bar', component: Bar},
+            {path: '/sub', component: Sub}
+          ]
+        },
+        {
+          path: '/about', component: About
+        }
+      ]
+    })
+
+    new Vue({
+      router,
+      template: '#container'
+    }).$mount('#app')
+  </script>
+</body>
+</html>

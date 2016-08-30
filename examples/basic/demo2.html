@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>嵌套路由</title>
+</head>
+<body>
+  <div id="app">
+    <a v-link="{ path: '/home'}">Home</a>
+    <a v-link="{ path: '/about'}">About</a>
+    <router-view></router-view>
+  </div>
+  <!-- 在home中被引用 -->
+  <template id="home">
+    <div>
+      <h1>Home</h1>
+      <p>{{msg}}</p>
+      <a v-link="{ path: '/home/bar'}">Bar</a>
+      <a v-link="{ path: '/home/sub'}">Sub</a>
+      <router-view></router-view>
+    </div>
+  </template>
+  <script src="vue.js"></script>
+  <script src="vue-router.js"></script>
+  <script>
+    const Home = Vue.extend({
+      template: '#home',
+      data: () => {
+          return {
+              msg: 'Hello, vue-router!'
+          }
+      }
+    })
+
+    const About = Vue.extend({
+      template: '<div><h1>About</h1><p>{{msg}}</p></div>',
+      data: () => {
+        return{
+          msg: 'vue-router: official route component'
+        }
+      }
+    })
+
+    const Bar = Vue.extend({
+      template: '<div><h2>Bar</h2><p>This is Bar</p></div>'
+    })
+
+    const Sub = Vue.extend({
+      template: '<div><h2>Sub</h2><p>This is Sub</p></div>'
+    })
+
+    const router = new VueRouter()
+
+    router.map({
+      '/home': { component: Home,
+        //二级路由
+        subRoutes:{
+          '/bar': {component: Bar},
+          '/sub': {component: Sub}
+        }
+      },
+      '/about': { component: About }
+    })
+
+    router.redirect({
+      '/': '/home'
+    })
+
+    const App = Vue.extend({})
+
+    router.start(App, '#app')
+  </script>
+</body>
+</html>

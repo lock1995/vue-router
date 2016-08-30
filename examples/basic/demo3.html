@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>具名路径</title>
+</head>
+<body>
+  <div id="app">
+    <a v-link="{ path: '/home'}">Home</a>
+    <a v-link="{ path: '/about'}">About</a>
+    <router-view></router-view>
+  </div>
+
+  <template id="home">
+    <div>
+      <h1>Home</h1>
+      <p>{{msg}}</p>
+      <!-- name可替代path，需与下面的name一致；params来传递参数，相当于实参 -->
+      <a v-link="{ name: 'user', params: { userId: 1 }}">user1</a>
+      <a v-link="{ name: 'user', params: { userId: 2 }}">user2</a>
+      <a v-link="{ name: 'user', params: { userId: 3 }}">user3</a>
+      <!-- 等同于上面 -->
+      <!-- <a v-link="{ path: '/home/user/1' }">user1</a>
+      <a v-link="{ path: '/home/user/2' }">user2</a>
+      <a v-link="{ path: '/home/user/3' }">user3</a> -->
+      <router-view></router-view>
+    </div>
+  </template>
+  <script src="vue.js"></script>
+  <script src="vue-router.js"></script>
+  <script>
+    const Home = Vue.extend({
+      template: '#home',
+      data: () => {
+          return {
+              msg: 'Hello, vue-router!'
+          }
+      }
+    })
+
+    const About = Vue.extend({
+      template: '<div><h1>About</h1><p>{{msg}}</p></div>',
+      data: () => {
+        return{
+          msg: 'vue-router: official route component'
+        }
+      }
+    })
+
+    const User = Vue.extend({
+      template: '<div><h2>User{{$route.params.userId}}</h2><p>This is User{{$route.params.userId}}</p></div>'
+    })
+
+    const router = new VueRouter()
+
+    router.map({
+      '/home': { component: Home,
+        subRoutes:{
+          //:userId相当于形参，由template中的v-link传递过来
+          '/user/:userId': {
+            name: 'user',
+            component: User
+          }
+        }
+      },
+      '/about': { component: About }
+    })
+
+    router.redirect({
+      '/': '/home'
+    })
+
+    const App = Vue.extend({})
+
+    router.start(App, '#app')
+  </script>
+</body>
+</html>

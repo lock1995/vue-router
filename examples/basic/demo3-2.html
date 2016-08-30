@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>具名路径</title>
+</head>
+<body>
+  <div id="container">
+    <div id="app">
+      <router-link to="/home"><a>Home</a></router-link>
+      <router-link to="/about"><a>About</a></router-link>
+      <router-view></router-view>
+    </div>
+  </div>
+
+  <template id="home">
+    <div>
+      <h1>Home</h1>
+      <p>{{msg}}</p>
+      <!-- 需要注意的是，2.0中使用具名路径时，to前需加:，相当于绑定了name -->
+      <router-link :to="{ name: 'user', params: { userId: 1 }}"><a>User1</a></router-link>
+      <router-link :to="{ name: 'user', params: { userId: 2 }}"><a>User2</a></router-link>
+      <router-link :to="{ name: 'user', params: { userId: 3 }}"><a>User3</a></router-link>
+      <router-view></router-view>
+    </div>
+  </template>
+  <script src="vue2.js"></script>
+  <script src="vue-router2.js"></script>
+  <script>
+    const Home = Vue.extend({
+      template: '#home',
+      data: () => {
+          return {
+              msg: 'Hello, vue-router!'
+          }
+      }
+    })
+
+    const About = Vue.extend({
+      template: '<div><h1>About</h1><p>{{msg}}</p></div>',
+      data: () => {
+        return{
+          msg: 'vue-router: official route component'
+        }
+      }
+    })
+
+    const User = Vue.extend({
+      template: '<div><h2>User{{$route.params.userId}}</h2><p>This is User{{$route.params.userId}}</p></div>'
+    })
+
+    const router = new VueRouter({
+      routes: [
+        {
+          path: '/', component: Home
+        },
+        {
+          path: '/home', component: Home,
+          children: [
+            {path: '/user/:userId', name: 'user', component: User}
+          ]
+        },
+        {
+          path: '/about', component: About
+        }
+      ]
+    })
+
+    new Vue({
+      router,
+      template: '#container'
+    }).$mount('#app')
+  </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>hooks</title>
+</head>
+<body>
+  <div id="app">
+    <a v-link="{ path: '/home'}">Home</a>
+    <a v-link="{ path: '/about'}">About</a>
+    <router-view></router-view>
+  </div>
+  <div class="well">
+    {{{ msg }}}
+  </div>
+  <template id="home">
+    <div>
+      <h1>Home</h1>
+      <p>{{msg}}</p>
+      <a v-link="{ path: '/home/bar'}">Bar</a>
+      <a v-link="{ path: '/home/sub'}">Sub</a>
+      <router-view></router-view>
+    </div>
+  </template>
+  <script src="vue.js"></script>
+  <script src="vue-router.js"></script>
+  <script>
+    const well = new Vue({
+        el: '.well',
+        data: {
+            msg: '',
+            color: '#ff0000'
+        },
+        methods: {
+            setColor: function(){
+                this.color = '#' + parseInt(Math.random()*256).toString(16)
+                            + parseInt(Math.random()*256).toString(16)
+                            + parseInt(Math.random()*256).toString(16)
+            },
+            setColoredMessage: function(msg){
+                this.msg +=  '<p style="color: ' + this.color + '">' + msg + '</p>'
+            },
+            setTitle: function(title){
+                this.msg =  '<h2 style="color: #333">' + title + '</h2>'
+            }
+        }
+    })
+
+    function RouteHelper(name) {
+        const route = {
+            canReuse: function(transition) {
+                well.setColoredMessage('执行组件' + name + '的钩子函数:canReuse')
+                return true
+            },
+            canActivate: function(transition) {
+                well.setColoredMessage('执行组件' + name + '的钩子函数:canActivate')
+                transition.next()
+            },
+            activate: function(transition) {
+                well.setColoredMessage('执行组件' + name + '的钩子函数:activate')
+                transition.next()
+            },
+            canDeactivate: function(transition) {
+                well.setColoredMessage('执行组件' + name + '的钩子函数:canDeactivate')
+                transition.next()
+            },
+            deactivate: function(transition) {
+                well.setColoredMessage('执行组件' + name + '的钩子函数:deactivate')
+                transition.next()
+            },
+            data: function(transition) {
+                well.setColoredMessage('执行组件' + name + '的钩子函数:data')
+                transition.next()
+            }
+        }
+        return route;
+    }
+
+    const Home = Vue.extend({
+        template: '#home',
+        data: function() {
+            return {
+                msg: 'Hello, vue router!',
+            }
+        },
+        route: RouteHelper('Home')
+    })
+
+    const Bar = Vue.extend({
+      template: '<div><h2>Bar</h2><p>This is Bar</p></div>',
+      route: RouteHelper('Bar')
+    })
+
+    const Sub = Vue.extend({
+      template: '<div><h2>Sub</h2><p>This is Sub</p></div>',
+      route: RouteHelper('Sub')
+    })
+
+    const About = Vue.extend({
+        template: '<div><h1>About</h1><p>{{msg}}</p></div>',
+        data: () => {
+          return{
+            msg: 'vue-router: official route component'
+          }
+        },
+        route: RouteHelper('About')
+    })
+
+    const router = new VueRouter()
+
+    router.map({
+      '/home': { component: Home,
+        subRoutes:{
+          '/bar': {component: Bar},
+          '/sub': {component: Sub}
+        }
+      },
+      '/about': { component: About }
+    })
+
+    router.redirect({
+      '/': '/home'
+    })
+
+    router.beforeEach(function(transition) {
+      well.setColor()
+      well.setTitle('跳转路径<span>[from = ' + transition.from.path + '], [to = ' + transition.to.path + ']</span>')
+      well.setColoredMessage('执行router的全局函数:beforeEach')
+      transition.next()
+    })
+
+    router.afterEach(function(transition) {
+      well.setColoredMessage('执行router的全局函数:afterEach')
+    })
+
+    const App = Vue.extend({})
+
+    router.start(App, '#app')
+  </script>
+</body>
+</html>

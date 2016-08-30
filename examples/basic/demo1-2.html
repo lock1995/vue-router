@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>vue-router基础2.0</title>
+</head>
+<body>
+  <div id="container">
+    <div id="app">
+      <div>
+        <!-- v-link改为router-link标签 -->
+        <router-link to="/home"><a>Home</a></router-link>
+        <router-link to="/about"><a>About</a></router-link>
+      </div>
+      <router-view></router-view>
+    </div>
+  </div>
+  <script src="vue2.js"></script>
+  <script src="vue-router2.js"></script>
+  <script>
+    const Home = Vue.extend({
+      template: '<div><h1>Home</h1><p>Hello, vue-router2.0!</p></div>',
+    })
+    const About = Vue.extend({
+      template: '<div><h1>About</h1><p>vue-router: official route component</p></div>',
+    })
+
+    // router.map集成到routes里，redirect也集成到这里
+    const router = new VueRouter({
+      routes: [
+        {
+          path: '/', component: Home
+        },
+        {
+          path: '/home', component: Home
+        },
+        {
+          path: '/about', component: About
+        }
+      ]
+    })
+
+    // mount用来把router发布到父组件中
+    new Vue({
+      router,
+      template: '#container'
+    }).$mount('#app')
+  </script>
+</body>
+</html>
